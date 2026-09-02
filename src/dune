@@ -1,10 +1,12 @@
-; The whole C part is one translation unit: mldsa_stubs.c #includes
-; native/mldsa_native_all.c, which in turn includes the vendored
+; The C part is one translation unit: mldsa_stubs.c #includes
+; native/mldsa_native_all.c, which includes the vendored
 ; native/mldsa_native/mldsa_native.c three times (one per parameter set).
+; The assembly backends live in mldsa_native_asm.S (see rule below).
 ;
-; Because these are dune foreign_stubs, they are compiled with the C compiler
-; of the *active OCaml toolchain* -- so `dune build -x solo5` (MirageOS)
-; builds them for the unikernel target.
+; Both are compiled with the C compiler of the *active OCaml toolchain* -- so
+; `dune build -x solo5` (MirageOS) builds them for the unikernel target, and
+; the backend (Neon / AVX2 / portable C) follows from the target compiler's
+; predefined macros. Target-specific flags come from gen_arch_flags.ml.
 (library
  (name mldsa)
  (public_name mldsa)
@@ -17,4 +19,36 @@
    (glob_files_rec native/**))
   (flags
    (:standard -O3 -fomit-frame-pointer -std=c99 -Wall -Wextra -Wshadow
-    -Wno-unused-function -DNDEBUG))))
+    -Wno-unused-function -DNDEBUG
+    (:include arch_cflags.sexp))))
+ ; native only: the assembly archive has no dll*.so counterpart for bytecode
+ (modes native)
+ (foreign_archives mldsa_asm))
+
+(rule
+ (targets arch_cflags.txt arch_cflags.sexp)
+ (action
+  (run %{ocaml} %{dep:gen_arch_flags.ml} %{ocaml-config:architecture}
+   %{env:MLDSA_ARCH_CFLAGS=} arch_cflags.txt arch_cflags.sexp)))
+
+; Assemble the (level-independent) native backend bundle. It is C-preprocessed,
+; so it needs the same config file; the parameter set is irrelevant for the
+; shared assembly but our config header insists on one being defined.
+(rule
+ (targets mldsa_native_asm.o)
+ (deps
+  (glob_files_rec native/**)
+  arch_cflags.txt)
+ (action
+  (run %{cc} -c -Inative -DNDEBUG "-DMLD_CONFIG_FILE=\"mldsa_ocaml_config.h\""
+   -DMLD_CONFIG_PARAMETER_SET=44 -DMLD_CONFIG_MULTILEVEL_WITH_SHARED
+   %{read-lines:arch_cflags.txt} native/mldsa_native/mldsa_native_asm.S
+   -o %{targets})))
+
+; Package it as a foreign archive (libmldsa_asm.a) so dune links it wherever
+; the library is used, including cross-compiled unikernels.
+(rule
+ (targets libmldsa_asm.a)
+ (deps mldsa_native_asm.o)
+ (action
+  (run ar rcs %{targets} mldsa_native_asm.o)))

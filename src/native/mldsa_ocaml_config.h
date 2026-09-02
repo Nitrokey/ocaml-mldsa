@@ -32,10 +32,29 @@
  * cross-compiled unikernel. */
 #define MLD_CONFIG_NO_RANDOMIZED_API
 
-/* Portable C only. The AArch64/x86_64 assembly backends are not vendored
- * (see vendor.sh); leave these undefined. */
-#undef MLD_CONFIG_USE_NATIVE_BACKEND_ARITH
-#undef MLD_CONFIG_USE_NATIVE_BACKEND_FIPS202
+/* Native backends.
+ *
+ * mldsa-native selects its backends at preprocessing time from the target
+ * compiler's predefined macros (src/sys.h): __aarch64__ -> Neon arithmetic +
+ * Neon/scalar Keccak; __x86_64__ && __AVX2__ -> AVX2 arithmetic + 4-way AVX2
+ * Keccak.  On any other target (or on x86-64 compiled without -mavx2) the
+ * *_BACKEND_FILE headers define nothing and the portable C code is used, so it
+ * is safe to enable the backends unconditionally.  The matching assembly is
+ * in mldsa_native_asm.S, built by a dune rule into libmldsa_asm.a.
+ *
+ * There is no runtime CPU detection: the default mld_sys_check_capability()
+ * returns 1, i.e. "whatever was enabled at compile time is present".  This
+ * is intentional -- the deployment CPU is known at build time (x86-64 with
+ * AVX2, or a Raspberry Pi 5 / Cortex-A76).  If that ever changes, define
+ * MLD_CONFIG_CUSTOM_CAPABILITY_FUNC (see upstream config) or build with
+ * -DMLDSA_OCAML_NO_NATIVE.
+ */
+#if !defined(MLDSA_OCAML_NO_NATIVE)
+#define MLD_CONFIG_USE_NATIVE_BACKEND_ARITH
+#define MLD_CONFIG_USE_NATIVE_BACKEND_FIPS202
+#define MLD_CONFIG_ARITH_BACKEND_FILE "native/meta.h"
+#define MLD_CONFIG_FIPS202_BACKEND_FILE "fips202/native/auto.h"
+#endif
 
 /* Optional: -DMLDSA_OCAML_REDUCE_RAM trades speed for a much smaller stack
  * footprint (ML-DSA-87 signing: ~107 KB -> ~14 KB). Useful for targets with a

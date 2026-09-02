@@ -3,10 +3,10 @@
 #
 # Usage: ./vendor.sh [git-ref]        (default: the ref recorded in VENDORED)
 #
-# We copy only the portable C frontend + C FIPS-202 backend. The assembly
-# backends (mldsa/src/native, mldsa/src/fips202/native, mldsa_native_asm.S)
-# are deliberately left out: this library targets cross-compiled MirageOS
-# unikernels, so we want a pure-C, toolchain-agnostic build.
+# We copy the full mldsa/ tree: C frontend, C FIPS-202 backend, and the
+# AArch64 (Neon) / x86-64 (AVX2) assembly backends plus their bundle
+# mldsa_native_asm.S. Backend selection happens at preprocessing time from the
+# target compiler's predefined macros (see src/native/mldsa_ocaml_config.h).
 set -eu
 
 UPSTREAM=https://github.com/pq-code-package/mldsa-native.git
@@ -22,7 +22,9 @@ COMMIT="$(git -C "$TMP/src" rev-parse HEAD)"
 rm -rf "$DEST"
 mkdir -p "$DEST"
 cp -R "$TMP/src/mldsa/." "$DEST/"
-rm -rf "$DEST/src/native" "$DEST/src/fips202/native" "$DEST/mldsa_native_asm.S" "$DEST/README.md"
+rm -rf "$DEST/README.md"
+# Armv8.1-M/Helium backend is experimental upstream and irrelevant for us.
+rm -rf "$DEST/src/fips202/native/armv81m"
 cp "$TMP/src/LICENSE" "$DEST/LICENSE"
 
 cat > "$(dirname "$0")/VENDORED" <<EOT
