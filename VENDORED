@@ -1,0 +1,4 @@
+upstream: https://github.com/pq-code-package/mldsa-native.git
+ref: main
+commit: b05bb096459f056d35ac671e48cb3599f8b49626
+date: 2026-09-02

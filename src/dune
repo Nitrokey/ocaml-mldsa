@@ -1,0 +1,20 @@
+; The whole C part is one translation unit: mldsa_stubs.c #includes
+; native/mldsa_native_all.c, which in turn includes the vendored
+; native/mldsa_native/mldsa_native.c three times (one per parameter set).
+;
+; Because these are dune foreign_stubs, they are compiled with the C compiler
+; of the *active OCaml toolchain* -- so `dune build -x solo5` (MirageOS)
+; builds them for the unikernel target.
+(library
+ (name mldsa)
+ (public_name mldsa)
+ (foreign_stubs
+  (language c)
+  (names mldsa_stubs)
+  (include_dirs native)
+  ; recompile when any vendored source or header changes
+  (extra_deps
+   (glob_files_rec native/**))
+  (flags
+   (:standard -O3 -fomit-frame-pointer -std=c99 -Wall -Wextra -Wshadow
+    -Wno-unused-function -DNDEBUG))))

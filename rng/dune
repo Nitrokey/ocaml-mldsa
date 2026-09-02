@@ -1,0 +1,4 @@
+(library
+ (name mldsa_rng)
+ (public_name mldsa-rng)
+ (libraries mldsa mirage-crypto-rng))
