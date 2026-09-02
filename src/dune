@@ -10,6 +10,10 @@
 (library
  (name mldsa)
  (public_name mldsa)
+ ; gen_arch_flags.ml is a build-time script run by the rule below, NOT a
+ ; module of this library (without this line dune would compile it in, and
+ ; its top-level Sys.argv access would raise when the .cma is loaded in utop).
+ (modules mldsa)
  (foreign_stubs
   (language c)
   (names mldsa_stubs)
@@ -21,8 +25,6 @@
    (:standard -O3 -fomit-frame-pointer -std=c99 -Wall -Wextra -Wshadow
     -Wno-unused-function -DNDEBUG
     (:include arch_cflags.sexp))))
- ; native only: the assembly archive has no dll*.so counterpart for bytecode
- (modes native)
  (foreign_archives mldsa_asm))
 
 (rule
@@ -52,3 +54,13 @@
  (deps mldsa_native_asm.o)
  (action
   (run ar rcs %{targets} mldsa_native_asm.o)))
+
+; Shared-object twin for bytecode (ocamlrun dlopens dll*.so). Built only when
+; the toolchain can produce shared libraries -- the same test dune applies to
+; its own dll*_stubs.so, so a solo5 cross context never asks for it.
+(rule
+ (targets dllmldsa_asm.so)
+ (deps mldsa_native_asm.o)
+ (enabled_if %{ocaml-config:supports_shared_libraries})
+ (action
+  (run %{cc} -shared -o %{targets} mldsa_native_asm.o)))

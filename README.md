@@ -90,7 +90,10 @@ vendor.sh, VENDORED                re-vendoring script and the pinned upstream c
   e.g. use `none` or `-mcpu=cortex-a72` for a Pi 4, since A76 code generation
   may use Armv8.2 instructions), `-DMLDSA_OCAML_NO_NATIVE` forces the portable
   C backends. The assembly is linked as a separate `libmldsa_asm.a`
-  (`foreign_archives`), so the library is `(modes native)` only.
+  (`foreign_archives`); its `dllmldsa_asm.so` twin for bytecode is built only
+  when `ocamlc -config` reports `supports_shared_libraries: true`, which is
+  the same test dune applies to its own `dll*_stubs.so`, so cross toolchains
+  such as solo5 never require it. Bytecode/utop use works on hosts.
   Measured on ML-DSA-87 (x86-64, AVX2 vs portable C): keygen 66 vs 172 µs,
   sign 192 vs 483 µs, verify 64 vs 147 µs.
 * **Stack usage.** Default configuration allocates working buffers on the C

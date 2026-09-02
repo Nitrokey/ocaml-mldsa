@@ -7,7 +7,7 @@ license: "Apache-2.0 OR ISC OR MIT"
 homepage: "https://github.com/nitrokey/ocaml-mldsa"
 bug-reports: "https://github.com/nitrokey/ocaml-mldsa/issues"
 depends: [
-  "dune" {>= "3.0"}
+  "dune" {>= "3.5"}
   "ocaml" {>= "4.13.0"}
   "mldsa" {= version}
   "mirage-crypto-rng" {>= "1.0.0"}

@@ -1,4 +1,16 @@
 (test
  (name test_mldsa)
+ (modules test_mldsa vectors)
  (package mldsa)
+ (modes native byte)
+ (libraries mldsa))
+
+; Load every unit of the library (as utop's #require does) to catch stray
+; modules with side-effecting initializers.
+(test
+ (name test_linkall)
+ (modules test_linkall)
+ (package mldsa)
+ (modes byte native)
+ (link_flags (-linkall))
  (libraries mldsa))
