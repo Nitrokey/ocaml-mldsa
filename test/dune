@@ -4,16 +4,16 @@
 ; _build/install/default/lib/stublibs. That directory only exists once the
 ; package's install files are built, so a bare `dune runtest` on a clean tree
 ; failed with "cannot load shared library dllmldsa_asm". `(deps (package
-; mldsa))` declares that requirement. (Affects any dune library with C stubs,
+; mldsa-native))` declares that requirement. (Affects any dune library with C stubs,
 ; not just the assembly archive; checked with dune 3.14.)
 
 (test
  (name test_mldsa)
  (modules test_mldsa vectors)
- (package mldsa)
+ (package mldsa-native)
  (modes native byte)
  (deps
-  (package mldsa))
+  (package mldsa-native))
  (libraries mldsa))
 
 ; Load every unit of the library (as utop's #require does) to catch stray
@@ -22,9 +22,9 @@
 (test
  (name test_linkall)
  (modules test_linkall)
- (package mldsa)
+ (package mldsa-native)
  (modes byte native)
  (deps
-  (package mldsa))
+  (package mldsa-native))
  (link_flags (-linkall))
  (libraries mldsa))

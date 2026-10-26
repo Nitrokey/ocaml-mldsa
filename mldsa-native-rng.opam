@@ -4,12 +4,12 @@ synopsis: "ML-DSA key generation and hedged signing using Mirage_crypto_rng"
 maintainer: ["Nitrokey GmbH"]
 authors: ["Nitrokey GmbH"]
 license: "Apache-2.0 OR ISC OR MIT"
-homepage: "https://github.com/nitrokey/ocaml-mldsa"
-bug-reports: "https://github.com/nitrokey/ocaml-mldsa/issues"
+homepage: "https://github.com/nitrokey/ocaml-mldsa-native"
+bug-reports: "https://github.com/nitrokey/ocaml-mldsa-native/issues"
 depends: [
   "dune" {>= "3.5"}
   "ocaml" {>= "4.13.0"}
-  "mldsa" {= version}
+  "mldsa-native" {= version}
   "mirage-crypto-rng" {>= "1.0.0"}
   "odoc" {with-doc}
 ]
@@ -27,4 +27,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/nitrokey/ocaml-mldsa.git"
+dev-repo: "git+https://github.com/nitrokey/ocaml-mldsa-native.git"

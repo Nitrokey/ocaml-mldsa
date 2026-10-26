@@ -1,4 +1,4 @@
-# ocaml-mldsa — ML-DSA (FIPS 204) for OCaml and MirageOS
+# ocaml-mldsa-native — ML-DSA (FIPS 204) for OCaml and MirageOS
 
 OCaml bindings to [mldsa-native](https://github.com/pq-code-package/mldsa-native),
 the formally verified, portable C90 implementation of the ML-DSA post-quantum
@@ -15,8 +15,8 @@ Two opam packages:
 
 | package     | contents                                                                                    | deps                 |
 |-------------|---------------------------------------------------------------------------------------------|----------------------|
-| `mldsa`     | `Mldsa.Mldsa44/65/87` — keygen from a seed, sign (hedged/deterministic), verify, external mu | none                 |
-| `mldsa-rng` | `Mldsa_rng.Mldsa44/65/87` — same, with seed/`rnd` drawn from `Mirage_crypto_rng`             | `mirage-crypto-rng`  |
+| `mldsa-native` | `Mldsa.Mldsa44/65/87` — keygen from a seed, sign (hedged/deterministic), verify, external mu | none                 |
+| `mldsa-native-rng` | `Mldsa_rng.Mldsa44/65/87` — same, with seed/`rnd` drawn from `Mirage_crypto_rng`             | `mirage-crypto-rng`  |
 
 The split keeps the C-embedding core free of dependencies; the RNG glue is a
 few lines and easy to replace if NetHSM wants to source randomness differently.
@@ -59,7 +59,7 @@ src/native/mldsa_native_all.c      includes mldsa_native.c three times (44/65/87
                                    examples/monolithic_build_multilevel
 src/native/mldsa_native/           vendored upstream sources (C + aarch64/x86-64 asm) — do not edit, run ./vendor.sh
 src/gen_arch_flags.ml              target-specific flags (-mavx2 -mbmi2 / -mcpu=cortex-a76)
-rng/                               mldsa-rng
+rng/                               mldsa-native-rng
 test/                              known-answer tests (vectors from upstream) + round trips + negatives
 vendor.sh, VENDORED                re-vendoring script and the pinned upstream commit
 ```
@@ -120,7 +120,7 @@ dune test                    # 78 checks: upstream KATs for all 3 levels, round 
 MLDSA_ARCH_CFLAGS=none dune test   # same, forcing the portable C backends on x86-64
 ```
 
-MirageOS: add `mldsa` (and `mldsa-rng`) to the unikernel's dependencies; the
+MirageOS: add `mldsa-native` (and `mldsa-native-rng`) to the unikernel's dependencies; the
 mirage tool's `dune build -x solo5` compiles `mldsa_stubs.c` with the solo5
 toolchain like any other foreign stub.
 

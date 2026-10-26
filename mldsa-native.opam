@@ -7,12 +7,12 @@ OCaml bindings to mldsa-native (https://github.com/pq-code-package/mldsa-native)
 The portable C implementation is vendored and compiled into the OCaml library
 as foreign stubs, with no dynamically linked dependency, so the library can be
 cross-compiled for MirageOS/solo5.  Randomness is passed in explicitly; see the
-mldsa-rng package for Mirage_crypto_rng integration."""
+mldsa-native-rng package for Mirage_crypto_rng integration."""
 maintainer: ["Nitrokey GmbH"]
 authors: ["Nitrokey GmbH"]
 license: "Apache-2.0 OR ISC OR MIT"
-homepage: "https://github.com/nitrokey/ocaml-mldsa"
-bug-reports: "https://github.com/nitrokey/ocaml-mldsa/issues"
+homepage: "https://github.com/nitrokey/ocaml-mldsa-native"
+bug-reports: "https://github.com/nitrokey/ocaml-mldsa-native/issues"
 depends: [
   "dune" {>= "3.5"}
   "ocaml" {>= "4.13.0"}
@@ -32,4 +32,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/nitrokey/ocaml-mldsa.git"
+dev-repo: "git+https://github.com/nitrokey/ocaml-mldsa-native.git"

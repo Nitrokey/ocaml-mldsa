@@ -8,7 +8,7 @@
     This library is deliberately free of an RNG dependency: key generation
     takes a 32-byte {e seed} and signing takes 32 bytes of fresh randomness
     [rnd] (hedged signing, FIPS 204 §3.4).  Use {!Mldsa_rng} (package
-    [mldsa-rng]) to obtain both from [Mirage_crypto_rng], or supply them from
+    [mldsa-native-rng]) to obtain both from [Mirage_crypto_rng], or supply them from
     the RNG of your choice. *)
 
 (** Errors reported when handling externally supplied data. *)

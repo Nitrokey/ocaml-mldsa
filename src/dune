@@ -9,7 +9,7 @@
 ; predefined macros. Target-specific flags come from gen_arch_flags.ml.
 (library
  (name mldsa)
- (public_name mldsa)
+ (public_name mldsa-native)
  ; gen_arch_flags.ml is a build-time script run by the rule below, NOT a
  ; module of this library (without this line dune would compile it in, and
  ; its top-level Sys.argv access would raise when the .cma is loaded in utop).
