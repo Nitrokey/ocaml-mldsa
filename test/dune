@@ -1,16 +1,30 @@
+; Bytecode test executables (.bc) load the C stubs at runtime via ocamlrun,
+; which finds dllmldsa_stubs.so / dllmldsa_asm.so through the
+; CAML_LD_LIBRARY_PATH that dune sets for tests:
+; _build/install/default/lib/stublibs. That directory only exists once the
+; package's install files are built, so a bare `dune runtest` on a clean tree
+; failed with "cannot load shared library dllmldsa_asm". `(deps (package
+; mldsa))` declares that requirement. (Affects any dune library with C stubs,
+; not just the assembly archive; checked with dune 3.14.)
+
 (test
  (name test_mldsa)
  (modules test_mldsa vectors)
  (package mldsa)
  (modes native byte)
+ (deps
+  (package mldsa))
  (libraries mldsa))
 
 ; Load every unit of the library (as utop's #require does) to catch stray
 ; modules with side-effecting initializers.
+
 (test
  (name test_linkall)
  (modules test_linkall)
  (package mldsa)
  (modes byte native)
+ (deps
+  (package mldsa))
  (link_flags (-linkall))
  (libraries mldsa))
